@@ -18,11 +18,11 @@ import { HiringModule } from './hiring/hiring.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: '91.216.107.164',
       port: 3306,
-      username: 'root',
-      password: '',
-      database: 'onep_info',
+      username: 'mutat2536477_2yylm6',
+      password: 'dopcayftlg',
+      database: 'mutat2536477_2yylm6',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),

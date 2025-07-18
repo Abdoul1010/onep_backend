@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+/*import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
@@ -29,5 +29,49 @@ async function bootstrap() {
   //await app.listen(process.env.PORT ?? 3000);
   await app.listen(process.env.PORT || 3000, '0.0.0.0');
 }
-bootstrap();
+bootstrap();*/
+
+import { NestFactory } from '@nestjs/core';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
+import { AppModule } from './app.module';
+import { join } from 'path';
+import fastifyCors from '@fastify/cors';
+import * as multipart from '@fastify/multipart';
+
+let app: NestFastifyApplication;
+
+async function createNestServer() {
+  if (!app) {
+    const fastifyInstance = require('fastify')();
+    
+    app = await NestFactory.create<NestFastifyApplication>(
+      AppModule,
+      new FastifyAdapter(fastifyInstance),
+      { logger: ['error', 'warn', 'debug', 'log', 'verbose'] }
+    );
+    
+    await app.register(multipart);
+    await app.register(fastifyCors, {
+      origin: '*',
+    });
+    
+    app.useStaticAssets({
+      root: join(__dirname, '..', 'uploads'),
+      prefix: '/uploads/',
+    });
+    
+    await app.init();
+  }
+  return app;
+}
+
+// Export pour Vercel
+export default async (req, res) => {
+  const nestApp = await createNestServer();
+  await nestApp.getHttpAdapter().getInstance().ready();
+  nestApp.getHttpAdapter().getInstance().server.emit('request', req, res);
+};
 

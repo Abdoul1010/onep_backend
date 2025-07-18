@@ -39,7 +39,8 @@ import {
 import { AppModule } from './app.module';
 import { join } from 'path';
 import fastifyCors from '@fastify/cors';
-import * as multipart from '@fastify/multipart';
+// Changez cette ligne
+import multipart from '@fastify/multipart';
 
 let app: NestFastifyApplication;
 
@@ -53,7 +54,13 @@ async function createNestServer() {
       { logger: ['error', 'warn', 'debug', 'log', 'verbose'] }
     );
     
-    await app.register(multipart);
+    // Changez cette ligne
+    await app.register(multipart, {
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
+      },
+    });
+    
     await app.register(fastifyCors, {
       origin: '*',
     });
